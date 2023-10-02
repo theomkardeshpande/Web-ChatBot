@@ -1,0 +1,154 @@
+from flask import Flask, render_template, request, redirect, url_for, session,jsonify,send_file
+from flask_mysqldb import MySQL
+import MySQLdb.cursors
+import re
+import openai
+
+arr=[]  
+app = Flask(__name__)
+  
+openai.api_key="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"
+app.secret_key = 'xyzsdfg'
+
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'user-system'
+  
+mysql = MySQL(app)
+  
+@app.route('/')
+@app.route('/login', methods =['GET', 'POST'])
+def login():
+    mesage = ''
+    if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
+        email = request.form['email']
+        password = request.form['password']
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM user WHERE email = % s AND password = % s', (email, password, ))
+        user = cursor.fetchone()
+        if user:
+            session['loggedin'] = True
+            session['userid'] = user['userid']
+            session['name'] = user['name']
+            session['email'] = user['email']
+            mesage = 'Logged in successfully !'
+            return render_template('chat.html', mesage = mesage)
+        else:
+            mesage = 'Please enter correct email / password !'
+    return render_template('login.html', mesage = mesage)
+  
+@app.route('/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('userid', None)
+    session.pop('email', None)
+    return redirect(url_for('login'))
+
+@app.route('/register', methods =['GET', 'POST'])
+def register():
+    mesage = ''
+    if request.method == 'POST' and 'name' in request.form and 'password' in request.form and 'email' in request.form and 'userID' in request.form:
+        userID=request.form['userID']
+        userName = request.form['name']
+        password = request.form['password']
+        email = request.form['email']
+
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('SELECT * FROM user WHERE email = % s', (email, ))
+        account = cursor.fetchone()
+        if account:
+            mesage = 'Account already exists !'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            mesage = 'Invalid email address !'
+        elif not userName or not password or not email:
+            mesage = 'Please fill out the form !'
+        else:
+            cursor.execute('INSERT INTO user VALUES (% s, % s, % s, % s)', ( userID, userName, email, password, ))
+            mysql.connection.commit()
+            mesage = 'You have successfully registered !'
+    elif request.method == 'POST':
+        mesage = 'Please fill out the form !'
+    return render_template('register.html', mesage = mesage)
+
+def get_completion(prompt):
+    print(prompt)
+    query = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are a chatbot, Also At end of response make sentence complete"},
+            {"role": "user", "content": prompt},
+        ],
+        max_tokens=100, 
+        temperature=1,
+        stop=["."],
+    )
+        # stop=None,
+        # temperature=0.2,
+    response=query.choices[0].message["content"]
+    return response
+
+@app.route("/query_view", methods=['POST', 'GET'])
+def query_view():
+    prompt = request.form['prompt']
+    if request.method=='GET':
+        print(arr)
+        return render_template('chat.html')
+    if request.method =='POST' and prompt.find('GET_RESOURCE') or bool(prompt.find('##')):
+        if 'GET_RESOURCE' in prompt or '##' in prompt:
+            if prompt=='GET_RESOURCE':
+                link='<b>Select Course:</b><br><p>1.BBACA</p><br><p>2.BBA</p><br><p>3.BBAIB</p><br><p>Type ## and Course Name</p>'
+                return jsonify({'response': link})
+            if '##BBACA' in prompt or '##BBA' in prompt or '##BBAIB' in prompt:
+                arr.append(prompt[2:])
+                link1='<b>Select Course:</b><br><p>1.First Year</p><br><p>2.Second Year</p><br><p>3.Third Year</p><br><p>Type ## and send Year</p>'
+                return jsonify({'response': link1})
+            if '##First' in prompt or '##Second' in prompt or '##Third' in prompt:
+                arr.append(prompt[2:])
+                link2='<b>Select Course:</b><br><p>1.1st SEM</p><br><p>2.2nd SEM</p><br><p>Type ## and send 1 or 2</p>'
+                return jsonify({'response': link2})
+            if '##1' in prompt or '##2' in prompt:
+                arr.append(prompt[2:])
+                link3="<a href='/download_file' download>Download File</a><br><p>You Can Download Other Resources By Sending GET_RESOURCE or Ask Queries</p>"
+                return jsonify({'response':link3})
+    if request.method == 'POST':
+        print('step1')
+        response = get_completion(prompt)
+        print(response)
+        return jsonify({'response': response})
+
+@app.route('/download_file')
+def download_file():
+    print('this is downloadfile',arr)
+    if arr[0]=='BBACA':
+        if arr[1]=='First':
+            if arr[2]=='1':
+                file_path = 'BBACA_Sem1.zip'
+                arr.clear()
+                return send_file(file_path, as_attachment=True)
+            elif arr[2]=='2':
+                file_path='BBACA_Sem2.zip'
+                arr.clear()
+                return send_file(file_path,as_attachment=True)
+        if arr[1]=='Second':
+            if arr[2]=='1':
+                file_path = 'BBACA_Sem3.zip'
+                arr.clear()
+                return send_file(file_path, as_attachment=True)
+            elif arr[2]=='2':
+                file_path='BBACA_Sem4.zip'
+                arr.clear()
+                return send_file(file_path,as_attachment=True)
+        if arr[1]=='Third':
+            if arr[2]=='1':
+                file_path = 'BBACA_Sem5.zip'
+                arr.clear()
+                return send_file(file_path, as_attachment=True)
+            elif arr[2]=='2':
+                file_path='BBACA_Sem6.zip'
+                arr.clear()
+                return send_file(file_path,as_attachment=True) 
+            
+
+if __name__ == "__main__":
+    app.run(debug=True)

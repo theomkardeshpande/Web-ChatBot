@@ -1,0 +1,124 @@
+body {
+    background-color: #F1F1F1;
+
+}
+
+.container {
+    /* Rectangle 1 */
+
+    position: absolute;
+    top: 150px;
+    left: 90px;
+    width: 1300.14px auto;
+    height: 400px;
+    /* left: calc(50% - 1300.14px/2 + 0.07px); */
+    /* top:  */
+
+    background: #ffffff;
+
+}
+
+.login-name {
+    font-family: 'Gotham';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 40px;
+    text-align: justify;
+    /* align-self: self-start; */
+
+    color: #272525;
+}
+
+label{
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 17px;
+}
+
+.btn-outline-primary {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 17px;
+}
+
+.btn-outline-warning {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+
+}
+
+.btn-outline-warning:hover {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    background-color: #ffecb1;
+}
+
+.ChatBot {
+    /* ChatBot */
+    /* 
+/* width: 498px; */
+    /* height: 132px; */
+    position: absolute;
+    left: 480px;
+    top: 55px;
+    /* bottom: 100px; */
+    text-align: justify;
+
+    font-family: 'Gotham';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 70px;
+    line-height: 20px;
+    text-align: center;
+
+    color: #dea806;
+
+    text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2);
+
+}
+
+.container-fluid {
+    position: absolute;
+    /* left: 200px; */
+    /* top: 20px; */
+    top: 10px;
+    bottom: 10px;
+    background: rgb(242, 249, 186);
+    width: 1490px auto;
+    height: 130px;
+    /* align-items: ju; */
+}
+
+.bg-label {
+
+    position: absolute;
+    left: 200px;
+    top: 10px;
+
+}
+
+.text-center {
+    position: absolute;
+    left: 17px;
+    /* padding-top: 100px; */
+    margin-top: 10px;
+    /* margin-right: 100px; */
+}
+
+.logo-main{
+    position: absolute;
+    height: 100px;
+    width: auto;
+    left: auto;
+    left: 370px;
+    top: 10px;
+    filter: drop-shadow(6px 5px 7px rgba(0, 0, 0, 0.4));
+    /* box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.2); */
+}
