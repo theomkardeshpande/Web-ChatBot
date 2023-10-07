@@ -5,7 +5,9 @@ body,html{
    background: -webkit-linear-gradient(to right, rgb(40, 59, 34), rgb(54, 60, 70), rgb(32, 32, 43));
 	background: linear-gradient(to right, rgb(38, 51, 61), rgb(50, 55, 65), rgb(33, 33, 78));
 }
-
+.para{
+	font-size:larger;
+}
 .logout{
 	align-items: center;
 	align-self: center;
@@ -205,6 +207,7 @@ body,html{
 	margin-top: auto;
 	margin-bottom: auto;
 	margin-left: 15px;
+	/* font-size: medium; */
 }
 .user_info span{
 	font-size: 20px;
