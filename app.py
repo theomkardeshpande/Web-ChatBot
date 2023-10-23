@@ -3,6 +3,8 @@ from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
 import openai
+import os
+import shutil
 
 arr=[]  
 app = Flask(__name__)
@@ -43,6 +45,7 @@ def logout():
     session.pop('loggedin', None)
     session.pop('userid', None)
     session.pop('email', None)
+    os.remove("chat_history.txt")
     return redirect(url_for('login'))
 
 @app.route('/new_register', methods =['GET', 'POST'])
@@ -80,6 +83,8 @@ def new_register():
 
 def get_completion(prompt):
     print(prompt)
+    with open("chat_history.txt", "a") as chat_file:
+        chat_file.write(f"User:{prompt}\n")
     query = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -93,6 +98,8 @@ def get_completion(prompt):
         # stop=None,
         # temperature=0.2,
     response=query.choices[0].message["content"]
+    with open("chat_history.txt", "a") as chat_file:
+        chat_file.write(f"Chabot:{response} \n")
     return response
 
 @app.route("/query_view", methods=['POST', 'GET'])
@@ -104,26 +111,53 @@ def query_view():
     if request.method =='POST' and prompt.find('GET_RESOURCE') or bool(prompt.find('##')):
         if 'GET_RESOURCE' in prompt or '##' in prompt:
             if prompt=='GET_RESOURCE':
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f"User:{prompt} \n")
                 link='<b>Select Course:</b><br><p>1.BBACA</p><br><p>2.BBA</p><br><p>3.BBAIB</p><br><p>Type ## and Course Name</p>'
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f"Chatbot:{link} \n")
                 return jsonify({'response': link})
             if '##BBACA' in prompt or '##BBA' in prompt or '##BBAIB' in prompt:
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f"User:{prompt} \n")
                 arr.append(prompt[2:])
                 link1='<b>Select Course:</b><br><p>1.First Year</p><br><p>2.Second Year</p><br><p>3.Third Year</p><br><p>Type ## and send Year</p>'
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f"Chatbot:{link1} \n")
                 return jsonify({'response': link1})
             if '##First' in prompt or '##Second' in prompt or '##Third' in prompt:
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f"User:{prompt} \n")
                 arr.append(prompt[2:])
                 link2='<b>Select Course:</b><br><p>1.1st SEM</p><br><p>2.2nd SEM</p><br><p>Type ## and send 1 or 2</p>'
+                with open("chat_history.txt", "a") as chat_file:    
+                    chat_file.write(f"Chatbot:{link2} \n")
                 return jsonify({'response': link2})
             if '##1' in prompt or '##2' in prompt:
+                with open("chat_history.txt", "a") as chat_file:    
+                    chat_file.write(f"User:{prompt} \n")
                 arr.append(prompt[2:])
                 link3="<a href='/download_file' download>Download File</a><br><p>You Can Download Other Resources By Sending GET_RESOURCE or Ask Queries</p>"
+                with open("chat_history.txt", "a") as chat_file:    
+                    chat_file.write(f"Chatbot:{link3} \n")
                 return jsonify({'response':link3})
+    if request.method =='POST' and 'GET_CHAT' in prompt:
+        download_link="<a href='/download_chat' download>Download Chat</a></p>"
+        return jsonify({'response':download_link})
     if request.method == 'POST':
         print('step1')
         response = get_completion(prompt)
         print(response)
         return jsonify({'response': response})
 
+@app.route('/download_chat')
+def download_chat():
+    chat_filename = 'chat_history.txt'
+
+    if os.path.exists(chat_filename):
+        return send_file(chat_filename, as_attachment=True, download_name='chat_history.txt')
+    
+    
 @app.route('/download_file')
 def download_file():
     print('this is downloadfile',arr)
@@ -132,28 +166,40 @@ def download_file():
             if arr[2]=='1':
                 file_path = 'BBACA_Sem1.zip'
                 arr.clear()
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f'::::User Downloaded File {file_path}::::\n')
                 return send_file(file_path, as_attachment=True)
             elif arr[2]=='2':
                 file_path='BBACA_Sem2.zip'
                 arr.clear()
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f'::::User Downloaded File {file_path}::::\n')
                 return send_file(file_path,as_attachment=True)
         if arr[1]=='Second':
             if arr[2]=='1':
                 file_path = 'BBACA_Sem3.zip'
                 arr.clear()
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f'::::User Downloaded File {file_path}::::\n')
                 return send_file(file_path, as_attachment=True)
             elif arr[2]=='2':
                 file_path='BBACA_Sem4.zip'
                 arr.clear()
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f'::::User Downloaded File {file_path}::::\n')
                 return send_file(file_path,as_attachment=True)
         if arr[1]=='Third':
             if arr[2]=='1':
                 file_path = 'BBACA_Sem5.zip'
                 arr.clear()
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f'::::User Downloaded File {file_path}::::\n')
                 return send_file(file_path, as_attachment=True)
             elif arr[2]=='2':
                 file_path='BBACA_Sem6.zip'
                 arr.clear()
+                with open("chat_history.txt", "a") as chat_file:
+                    chat_file.write(f'::::User Downloaded File {file_path}::::\n')
                 return send_file(file_path,as_attachment=True) 
             
 
