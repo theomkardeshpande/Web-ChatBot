@@ -45,8 +45,8 @@ def logout():
     session.pop('email', None)
     return redirect(url_for('login'))
 
-@app.route('/register', methods =['GET', 'POST'])
-def register():
+@app.route('/new_register', methods =['GET', 'POST'])
+def new_register():
     mesage = ''
     if request.method == 'POST' and 'name' in request.form and 'password' in request.form and 'email' in request.form and 'userID' in request.form:
         userID=request.form['userID']
@@ -57,19 +57,26 @@ def register():
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM user WHERE email = % s', (email, ))
         account = cursor.fetchone()
+        cursor.execute('SELECT * FROM user WHERE userid = %s', (userID,))
+        result=cursor.fetchone()
+
         if account:
             mesage = 'Account already exists !'
+        elif result:
+            mesage='This User Name is Already Exits..! Try Another'
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             mesage = 'Invalid email address !'
         elif not userName or not password or not email:
             mesage = 'Please fill out the form !'
+        elif not userName.isalpha():
+            mesage='Please Enter Only Alphabets in Name !'    
         else:
             cursor.execute('INSERT INTO user VALUES (% s, % s, % s, % s)', ( userID, userName, email, password, ))
             mysql.connection.commit()
             mesage = 'You have successfully registered !'
     elif request.method == 'POST':
         mesage = 'Please fill out the form !'
-    return render_template('register.html', mesage = mesage)
+    return render_template('new_register.html', mesage = mesage)
 
 def get_completion(prompt):
     print(prompt)

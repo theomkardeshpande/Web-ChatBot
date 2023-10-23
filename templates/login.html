@@ -13,6 +13,7 @@
 		crossorigin="anonymous"></script>
 	<!-- <link href="https://fonts.cdnfonts.com/css/gotham-6" rel="stylesheet"> -->
 	<link rel="stylesheet" href="/static/login.css">
+	<link rel="icon" type="image/png" href="../static/logo.png"/> 
 </head>
 
 <body>
@@ -29,19 +30,22 @@
 			{% if mesage is defined and mesage %}
 			<div class="alert alert-warning">{{ mesage }}</div>
 			{% endif %}
-			<div class="form-group">
-				<label for="email">Email:</label>
-				<input type="email" class="form-control" id="email" name="email" placeholder="Email" name="email">
-			</div>
-			<div class="form-group">
-				<label for="pwd">Password:</label>
-				<input type="password" class="form-control" id="password" name="password" placeholder="Password"
-					name="pswd">
+			<div class="row g-3 align-items-center">
+				<div class="col-md-4">
+					<label for="email" class="sr-only" >Email:</label>
+					<input type="email" class="form-control" id="email" name="email" placeholder="Email" name="email">
+				</div>
+				<div class="row g-3 align-items-center">
+					<div class="col-md-4">
+						<label for="pwd">Password:</label>
+						<input type="password" class="form-control" id="password" name="password" placeholder="Password"
+						name="pswd">
+					</div>
+				</div>
 			</div>
 			<button type="submit" class="btn btn-outline-primary">Login</button><br>
-			<p class="bottom">Dont't have an account? <a class="btn btn-outline-warning" href="{{url_for('register')}}">
-					Register
-					here</a></p>
+			<p class="bottom">Dont't have an account? <a class="btn btn-outline-warning" href="{{url_for('new_register')}}">Register here</a></p>
+	</div>
 		</form>
 	</div>
 </body>
