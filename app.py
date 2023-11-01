@@ -45,7 +45,8 @@ def logout():
     session.pop('loggedin', None)
     session.pop('userid', None)
     session.pop('email', None)
-    os.remove("chat_history.txt")
+    if os.path.isfile("chat_history.txt"):
+        os.remove("chat_history.txt")
     return redirect(url_for('login'))
 
 @app.route('/new_register', methods =['GET', 'POST'])
